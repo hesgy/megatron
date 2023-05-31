@@ -420,6 +420,7 @@ class MixedPrecisionOptimizer(MegatronOptimizer):
             timers('optimizer-unscale-and-check-inf', log_level=1).start(
                 barrier=args.barrier_with_L1_time)
             found_inf_flag = self._unscale_main_grads_and_check_for_nan()
+            found_inf_flag = True
             timers('optimizer-unscale-and-check-inf').stop()
 
             # We are done with scaling gradients

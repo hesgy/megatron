@@ -893,7 +893,7 @@ def _add_mixed_precision_args(parser):
                        help='Static loss scaling, positive power of 2 '
                        'values can improve fp16 convergence. If None, dynamic'
                        'loss scaling is used.')
-    group.add_argument('--initial-loss-scale', type=float, default=2**32,
+    group.add_argument('--initial-loss-scale', type=float, default=2**16,
                        help='Initial loss-scale for dynamic loss scaling.')
     group.add_argument('--min-loss-scale', type=float, default=1.0,
                        help='Minimum loss scale for dynamic loss scale.')
