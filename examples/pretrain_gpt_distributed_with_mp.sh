@@ -12,10 +12,9 @@ NNODES=1
 NODE_RANK=0
 WORLD_SIZE=$(($GPUS_PER_NODE*$NNODES))
 
-CHECKPOINT_PATH=<Specify path>
-VOCAB_FILE=<Specify path to file>/gpt2-vocab.json
-MERGE_FILE=<Specify path to file>/gpt2-merges.txt
-DATA_PATH=<Specify path and file prefix>_text_document
+VOCAB_FILE=gpt2-vocab.json
+MERGE_FILE=gpt2-merges.txt
+DATA_PATH=gpt2_text_document
 
 DISTRIBUTED_ARGS="
     --nproc_per_node $GPUS_PER_NODE \
@@ -26,18 +25,20 @@ DISTRIBUTED_ARGS="
 "
 
 GPT_ARGS="
-    --tensor-model-parallel-size 2 \
-    --pipeline-model-parallel-size 2 \
+    --tensor-model-parallel-size 8 \
     --sequence-parallel \
-    --num-layers 24 \
-    --hidden-size 1024 \
-    --num-attention-heads 16 \
-    --seq-length 1024 \
-    --max-position-embeddings 1024 \
-    --micro-batch-size 4 \
-    --global-batch-size 16 \
+    --recompute-activations \
+    --num-layers 1 \
+    --hidden-size 25600 \
+    --num-attention-heads 160 \
+    --seq-length 2048 \
+    --max-position-embeddings 2048 \
+    --micro-batch-size 1 \
+    --global-batch-size 32 \
     --lr 0.00015 \
     --train-iters 500000 \
+    --timing-log-level 2 \
+    --timing-log-option max \
     --lr-decay-iters 320000 \
     --lr-decay-style cosine \
     --min-lr 1.0e-5 \
@@ -56,7 +57,8 @@ DATA_ARGS="
 "
 
 OUTPUT_ARGS="
-    --log-interval 100 \
+    --log-interval 5 \
+    --exit-interval 20 \
     --save-interval 10000 \
     --eval-interval 1000 \
     --eval-iters 10
@@ -66,7 +68,5 @@ torchrun $DISTRIBUTED_ARGS pretrain_gpt.py \
     $GPT_ARGS \
     $DATA_ARGS \
     $OUTPUT_ARGS \
-    --distributed-backend nccl \
-    --save $CHECKPOINT_PATH \
-    --load $CHECKPOINT_PATH
+    --distributed-backend nccl
 
